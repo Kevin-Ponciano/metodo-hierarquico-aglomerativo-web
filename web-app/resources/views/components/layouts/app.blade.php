@@ -5,60 +5,73 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>{{config('app.name')}}</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet"/>
-     @livewireStyles
-    {{--    Jquery--}}
+
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/js/tabler.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css">
+
+
+    @livewireStyles
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 <body>
-<!--
-  This example requires updating your template:
 
-  ```
-  <html class="h-full bg-gray-100">
-  <body class="h-full">
-  ```
--->
-<div class="min-h-full">
-  <nav class="bg-white">
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-      <div class="flex h-16 items-center justify-between">
-        <div class="flex items-center">
-          <div class="flex-shrink-0">
-            <img class="h-12" src="{{asset('assets/img/logo.png')}}" alt="Your Company">
-          </div>
-          <div class="hidden md:block">
-            <div class="ml-10 flex items-baseline space-x-4">
-              <a href="#" class="bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium" aria-current="page">Home</a>
-            </div>
-          </div>
+<div class="page">
+    <header class="bg-white navbar navbar-expand-md d-print-none">
+        <div class="container-xl">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-menu"
+                    aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <h1 class="navbar-brand navbar-brand-autodark d-none-navbar-horizontal pe-0 pe-md-3">
+                <a href=".">
+                    <img src="{{asset('assets/img/logo.png')}}" width="110" height="32" alt="Tabler"
+                         class="navbar-brand-image">
+                </a>
+            </h1>
         </div>
-      </div>
+    </header>
+    <div class="page-wrapper">
+        <div class="page-header d-print-none">
+            <div class="container-xl">
+                <div class="row g-2 align-items-center">
+                    <div class="col">
+                        <!-- Page pre-title -->
+                        <div class="page-pretitle">
+                            Overview
+                        </div>
+                        <h2 class="page-title">
+                            Método Hierárquico Aglomerativo
+                        </h2>
+                    </div>
+                    <div class="col-auto ms-auto d-print-none">
+                        <div class="btn-list">
+                            <a href="#" class="btn btn-primary d-none d-sm-inline-block" data-bs-toggle="modal"
+                               data-bs-target="#modal-create">
+                                <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24"
+                                     viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
+                                     stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                    <path d="M12 5l0 14"></path>
+                                    <path d="M5 12l14 0"></path>
+                                </svg>
+                                Novo Calculo
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="page-body">
+            {{ $slot }}
+        </div>
     </div>
-
-    <!-- Mobile menu, show/hide based on menu state. -->
-    <div class="md:hidden" id="mobile-menu">
-      <div class="space-y-1 px-2 pb-3 pt-2 sm:px-3">
-        <a href="#" class="bg-gray-900 text-white block rounded-md px-3 py-2 text-base font-medium" aria-current="page">Home</a>
-      </div>
-      <div class="border-t border-gray-700 pb-3 pt-4">
-        <div class="flex items-center px-5">
-          <div class="flex-shrink-0">
-            <img class="h-10 w-10 rounded-full" src="{{asset('assets/img/logo.png')}}" alt="">
-          </div>
-      </div>
-      </div>
-    </div>
-  </nav>
-  <main class="bg-gray-50">
-    <div class="">
-        {{ $slot }}
-    </div>
-  </main>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler-flags.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler-payments.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler-vendors.min.css">
+
 @livewireScripts
 </body>
 </html>
