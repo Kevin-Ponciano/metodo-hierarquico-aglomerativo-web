@@ -1,0 +1,59 @@
+version: '3.9'
+
+services:
+  web-app:
+    image: laravel-octane
+    build:
+      context: .
+      dockerfile: Dockerfile-prod
+    networks:
+      - traefik_public
+    ports:
+      - "8082:80"
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.web-app.rule=Host(`mha.laravix.com.br`)"
+        - "traefik.http.services.web-app.loadbalancer.server.port=80"
+        - "traefik.http.routers.web-app.service=web-app"
+        - "traefik.http.routers.web-app.entrypoints=https"
+        - "traefik.http.routers.web-app.tls=true"
+      replicas: 1
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+      restart_policy:
+        condition: on-failure
+
+  n8n:
+    image: n8nio/n8n
+    ports:
+      - "5679:5678"
+    environment:
+      - N8N_HOST=n8n2.laravix.com.br
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=https
+      - NODE_ENV=production
+    volumes:
+      - n8n_data:/home/node/.n8n
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.n8n.rule=Host(`n8n2.laravix.com.br`)"
+        - "traefik.http.services.n8n.loadbalancer.server.port=5678"
+        - "traefik.http.routers.n8n.service=n8n"
+        - "traefik.http.routers.n8n.entrypoints=https"
+        - "traefik.http.routers.n8n.tls=true"
+    networks:
+      - traefik_public
+
+
+
+networks:
+  traefik_public:
+    external: true
+
+volumes:
+  n8n_data:
+    external: true
