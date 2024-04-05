@@ -17,7 +17,7 @@ class App extends Component
     public $file;
     public $qtdClusters = 1;
     public $normalizarDados;
-    public $url = 'n8n.laravix.com.br/webhook/mha';
+    public $url = 'https://webhook.n8n.tecnovix.com.br/webhook/mha';
     public $registro;
 
     public function mount()
@@ -50,7 +50,6 @@ class App extends Component
             $this->dispatch('view');
         } else {
             $this->dispatch('error', 'Erro ao enviar arquivo!');
-            debug($response->json());
         }
 
         Storage::delete($path);
@@ -70,7 +69,5 @@ class App extends Component
     public function view($id)
     {
         $this->registro = Registro::find($id)->toArray();
-        debug($this->registro['response']['response']['Cluster - 1']['atributos'][0]);
-        //$this->dispatch('openModal');
     }
 }
