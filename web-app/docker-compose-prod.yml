@@ -3,9 +3,6 @@ version: '3.9'
 services:
   web-app:
     image: laravel-octane
-    build:
-      context: .
-      dockerfile: Dockerfile-prod
     networks:
       - traefik_public
     ports:
