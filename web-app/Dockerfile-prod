@@ -70,10 +70,6 @@ RUN php artisan octane:install --server=swoole
 #RUN php artisan view:cache
 #RUN php artisan event:cache
 
-RUN echo "* * * * * cd $APP_DIR && php artisan schedule:run" > /etc/cron.d/laravel \
-    && chmod 0644 /etc/cron.d/laravel \
-    && crontab /etc/cron.d/laravel
-
 ### NGINX
 RUN apt-get install nginx -y
 RUN rm -rf /etc/nginx/sites-enabled/* && rm -rf /etc/nginx/sites-available/*
