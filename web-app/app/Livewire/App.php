@@ -15,7 +15,7 @@ class App extends Component
     use WithPagination;
 
     public $file;
-    public $qtdClusters;
+    public $qtdClusters=1;
     public $normalizarDados;
     public $url = 'http://n8n:5678/webhook/34dfbc5f-04c1-4881-8d39-7d344130eada';
 
@@ -32,15 +32,17 @@ class App extends Component
         $response = $this->sendWebhook(Storage::get($path), $path);
         if ($response->successful()) {
             $this->dispatch('success', 'Arquivo enviado com sucesso!');
-            Registro::create([
+            $newRegistro = Registro::create([
                 'qtd_clusters' => $this->qtdClusters,
-                'normalizar_dados' => $this->normalizarDados,
+                'normalizar_dados' => $this->normalizarDados ? 'True' : 'False',
                 'file_name' => $this->file->getClientOriginalName(),
                 'response' => $response->json(),
             ]);
+            $this->dispatch('fileUploaded', $newRegistro);
             debug($response->json());
         } else {
             $this->dispatch('error', 'Erro ao enviar arquivo!');
+            debug($response->json());
         }
 
         Storage::delete($path);
@@ -48,14 +50,13 @@ class App extends Component
 
     public function sendWebhook($file, $path)
     {
-        $normalizarDados = $this->normalizarDados ? 'True' : 'False';
         return Http::withOptions([
             'verify' => false,
         ])
             ->attach('data', $file, $path)
             ->post($this->url, [
                 'qtdClusters' => $this->qtdClusters,
-                'normalizarDados' => $normalizarDados,
+                'normalizarDados' => $this->normalizarDados ? 'True' : 'False',
                 'fileName' => $path,
             ]);
     }

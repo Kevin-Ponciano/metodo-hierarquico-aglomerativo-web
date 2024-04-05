@@ -122,12 +122,9 @@
                         </tbody>
                     </table>
                 </div>
-                <nav
-                    class="flex flex-col md:flex-row justify-between items-start md:items-center space-y-3 md:space-y-0 p-4"
-                    aria-label="Table navigation">
-
-                </nav>
-                {{ $registros->links() }}
+                <div class="m-2">
+                    {{ $registros->links() }}
+                </div>
             </div>
         </div>
     </section>
@@ -142,7 +139,7 @@
                 <div
                     class="flex justify-between items-center pb-4 mb-4 rounded-t border-b sm:mb-5 disable:border-gray-600">
                     <h3 class="text-lg font-semibold text-gray-900 disable:text-white">Add Product</h3>
-                    <button type="button"
+                    <button type="button" id="createProductModalCloseButton"
                             class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center disable:hover:bg-gray-600 disable:hover:text-white"
                             data-modal-target="createProductModal" data-modal-toggle="createProductModal">
                         <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
@@ -377,4 +374,11 @@
             </div>
         </div>
     </div>
+    @script
+    <script>
+        $wire.on('fileUploaded', (event) => {
+            $('#createProductModalCloseButton').click();
+        });
+    </script>
+    @endscript
 </div>
