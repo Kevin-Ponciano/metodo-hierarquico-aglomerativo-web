@@ -3,10 +3,8 @@
 namespace App\Livewire;
 
 use App\Models\Registro;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
-use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
@@ -17,19 +15,20 @@ class App extends Component
     use WithPagination;
 
     public $file;
-    public $qtdClusters=1;
+    public $qtdClusters = 1;
     public $normalizarDados;
-    public $url = 'https://n8n.laravix.com.br/webhook/mha';
+    public $url = 'n8n.laravix.com.br/webhook/mha';
     public $registro;
 
-    public function mount(){
+    public function mount()
+    {
 
     }
 
     public function render()
     {
         return view('livewire.app', [
-            'registros' => Registro::orderBy('id','desc')->paginate(10)
+            'registros' => Registro::orderBy('id', 'desc')->paginate(10)
         ]);
     }
 
@@ -59,10 +58,7 @@ class App extends Component
 
     public function sendWebhook($file, $path)
     {
-        return Http::withOptions([
-            'verify' => false,
-        ])
-            ->attach('data', $file, $path)
+        return Http::attach('data', $file, $path)
             ->post($this->url, [
                 'qtdClusters' => $this->qtdClusters,
                 'normalizarDados' => $this->normalizarDados ? 'True' : 'False',
