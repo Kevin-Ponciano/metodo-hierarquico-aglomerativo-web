@@ -64,6 +64,8 @@ RUN composer install --no-interaction --no-dev --optimize-autoloader
 ### OCTANE
 RUN php artisan octane:install --server=swoole
 
+RUN php artisan optimize
+
 ### Comandos úteis para otimização da aplicação
 #RUN php artisan config:cache
 #RUN php artisan route:cache
