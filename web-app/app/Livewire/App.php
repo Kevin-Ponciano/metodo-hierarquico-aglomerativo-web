@@ -19,7 +19,7 @@ class App extends Component
     public $file;
     public $qtdClusters=1;
     public $normalizarDados;
-    public $url = 'http://n8n:5678/webhook/34dfbc5f-04c1-4881-8d39-7d344130eada';
+    public $url = 'https://webhook.n8n.laravix.com.br/webhook/mha';
     public $registro;
 
     public function mount(){
