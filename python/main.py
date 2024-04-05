@@ -151,7 +151,7 @@ def executar_agrupamento(caminho, n_clusters, is_normalizar_dados):
 
 if __name__ == "__main__":
     n_clusters = 5
-    caminho = "/home/kevin/repositorios/metodo-hierarquico-aglomerativo-web/python/dados/flores.txt"
+    caminho = "/home/dev/repositorios/metodo-hierarquico-aglomerativo-web/python/dados/flores.txt"
     is_normalizar_dados = False
     ahc = executar_agrupamento(caminho, n_clusters, is_normalizar_dados)
     print(json.dumps(ahc, indent=4))
