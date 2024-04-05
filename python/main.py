@@ -4,7 +4,7 @@ import json
 
 # Função para remover o ponto e vírgula final das linhas do arquivo CSV
 def remover_ponto_virgula_final(linha):
-    return linha[:-1] if linha[-1] == '' else linha
+    return linha[:-1] if linha[-1] == "" else linha
 
 # Função para ler dados do arquivo e mapear classes para números
 def ler_dados_arquivo(caminho):
@@ -12,12 +12,12 @@ def ler_dados_arquivo(caminho):
     mapeamento_classes = {}
     contador_classes = 0
 
-    with open(caminho, 'r', encoding='utf-8') as arquivo:
-        leitor_csv = csv.reader(arquivo, delimiter=';')
+    with open(caminho, "r", encoding="utf-8") as arquivo:
+        leitor_csv = csv.reader(arquivo, delimiter=";")
         for linha in leitor_csv:
             if linha:
                 linha_limpa = remover_ponto_virgula_final(linha)
-                atributos = list(map(float, linha_limpa[1:-1])) # Converte strings para float
+                atributos = list(map(float, linha_limpa[0:-1])) # Converte strings para float
                 classe = linha_limpa[-1]
 
                 if classe not in mapeamento_classes:
@@ -59,7 +59,7 @@ def clusterizacao_hierarquica(dados, n_clusters):
     num_clusters = len(clusters)
 
     # Prepara a matriz de distâncias com dimensões apropriadas
-    distancias = np.full((num_clusters, num_clusters), float('inf'))
+    distancias = np.full((num_clusters, num_clusters), float("inf"))
 
     # Etapa 2: Preenche a matriz de distâncias com distâncias euclidianas
     for i in range(num_clusters):
@@ -69,7 +69,7 @@ def clusterizacao_hierarquica(dados, n_clusters):
 
     # Repete as etapas 2 e 3 até atingir o número desejado de clusters
     while len(clusters) > n_clusters:
-        dist_min = float('inf')
+        dist_min = float("inf")
         para_unir = None
 
         # Encontra os dois clusters mais próximos baseado na matriz de distâncias
@@ -87,8 +87,8 @@ def clusterizacao_hierarquica(dados, n_clusters):
         # Etapa 4: Atualiza a matriz de distâncias para refletir a união dos clusters
         # Adiciona uma nova linha e coluna à matriz de distâncias
         num_clusters_atual = len(distancias)
-        nova_coluna = np.full((num_clusters_atual, 1), float('inf'))
-        nova_linha = np.full((1, num_clusters_atual+1), float('inf'))
+        nova_coluna = np.full((num_clusters_atual, 1), float("inf"))
+        nova_linha = np.full((1, num_clusters_atual+1), float("inf"))
         
         distancias = np.append(distancias, nova_coluna, axis=1)
         distancias = np.append(distancias, nova_linha, axis=0)
@@ -129,7 +129,7 @@ def executar_agrupamento(caminho, n_clusters, is_normalizar_dados):
     if is_normalizar_dados:
         dados_tratados = normalizar_dados(dados)
     else:
-        dados_tratados = dados
+        dados_tratados = np.array(dados)
         
     clusters_indices = clusterizacao_hierarquica(dados_tratados, n_clusters)
 
@@ -137,9 +137,9 @@ def executar_agrupamento(caminho, n_clusters, is_normalizar_dados):
         cluster_info = {}
         atributos_cluster = []
         total_objetos = len(indices)
+        cluster_info["total_objetos"] = total_objetos
         for indice in indices:
             atributos_cluster.append(dados_tratados[indice].tolist())  # Converte cada array NumPy para lista
-        resultado_dict[f"Cluster - {str(i)}"]["Total de objetos"] = total_objetos
         cluster_info["atributos"] = atributos_cluster
         resultado_dict[f"Cluster - {str(i)}"] = cluster_info  # Assegura que a chave é uma string
     
@@ -151,7 +151,7 @@ def executar_agrupamento(caminho, n_clusters, is_normalizar_dados):
 
 if __name__ == "__main__":
     n_clusters = 5
-    caminho = "C:\\Users\\Desenvolvedor\\Documents\\Github\\metodo-hierarquico-aglomerativo-web\\python\\dados\\veiculos - teste II.txt"
-    is_normalizar_dados = True
+    caminho = "/home/kevin/repositorios/metodo-hierarquico-aglomerativo-web/python/dados/flores.txt"
+    is_normalizar_dados = False
     ahc = executar_agrupamento(caminho, n_clusters, is_normalizar_dados)
     print(json.dumps(ahc, indent=4))

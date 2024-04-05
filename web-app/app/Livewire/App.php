@@ -2,32 +2,61 @@
 
 namespace App\Livewire;
 
-use Illuminate\Http\Request;
+use App\Models\Registro;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
+use Livewire\WithFileUploads;
+use Livewire\WithPagination;
 
 class App extends Component
 {
+    use WithFileUploads;
+    use WithPagination;
+
+    public $file;
+    public $qtdClusters;
+    public $normalizarDados;
+    public $url = 'http://n8n:5678/webhook/34dfbc5f-04c1-4881-8d39-7d344130eada';
+
     public function render()
     {
-        return view('livewire.app');
+        return view('livewire.app', [
+            'registros' => Registro::paginate(10),
+        ]);
     }
 
-    public function upload(Request $request)
+    public function save()
     {
-        $url = 'https://webhook.n8n.laravix.com.br/webhook/284a51c5-dba2-476b-affe-524767e1454e';
+        $path = $this->file->storeAs(path: 'files', name: $this->file->getClientOriginalName());
+        $response = $this->sendWebhook(Storage::get($path), $path);
+        if ($response->successful()) {
+            $this->dispatch('success', 'Arquivo enviado com sucesso!');
+            Registro::create([
+                'qtd_clusters' => $this->qtdClusters,
+                'normalizar_dados' => $this->normalizarDados,
+                'file_name' => $this->file->getClientOriginalName(),
+                'response' => $response->json(),
+            ]);
+            debug($response->json());
+        } else {
+            $this->dispatch('error', 'Erro ao enviar arquivo!');
+        }
 
-        # send post with file
-        $response = Http::withOptions([
+        Storage::delete($path);
+    }
+
+    public function sendWebhook($file, $path)
+    {
+        $normalizarDados = $this->normalizarDados ? 'True' : 'False';
+        return Http::withOptions([
             'verify' => false,
         ])
-            ->withHeaders([
-                'Accept' => 'application/json',
-                'Content-Type' => 'multipart/form-data',
-            ])
-            ->attach('file', $request->file('file'))
-            ->post($url);
-
-        dd($response->json());
+            ->attach('data', $file, $path)
+            ->post($this->url, [
+                'qtdClusters' => $this->qtdClusters,
+                'normalizarDados' => $normalizarDados,
+                'fileName' => $path,
+            ]);
     }
 }
