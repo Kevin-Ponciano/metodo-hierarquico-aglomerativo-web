@@ -23,34 +23,34 @@ services:
       restart_policy:
         condition: on-failure
 
-  n8n:
-    image: n8nio/n8n
-    ports:
-      - "5679:5678"
-    environment:
-      - N8N_HOST=n8n2.laravix.com.br
-      - N8N_PORT=5678
-      - N8N_PROTOCOL=https
-      - NODE_ENV=production
-    volumes:
-      - n8n_data:/home/node/.n8n
-    deploy:
-      labels:
-        - "traefik.enable=true"
-        - "traefik.http.routers.n8n.rule=Host(`n8n2.laravix.com.br`)"
-        - "traefik.http.services.n8n.loadbalancer.server.port=5678"
-        - "traefik.http.routers.n8n.service=n8n"
-        - "traefik.http.routers.n8n.entrypoints=https"
-        - "traefik.http.routers.n8n.tls=true"
-    networks:
-      - traefik_public
-
+#  n8n:
+#    image: n8nio/n8n
+#    ports:
+#      - "5679:5678"
+#    environment:
+#      - N8N_HOST=n8n2.laravix.com.br
+#      - N8N_PORT=5678
+#      - N8N_PROTOCOL=https
+#      - NODE_ENV=production
+#    volumes:
+#      - n8n_data:/home/node/.n8n
+#    deploy:
+#      labels:
+#        - "traefik.enable=true"
+#        - "traefik.http.routers.n8n.rule=Host(`n8n2.laravix.com.br`)"
+#        - "traefik.http.services.n8n.loadbalancer.server.port=5678"
+#        - "traefik.http.routers.n8n.service=n8n"
+#        - "traefik.http.routers.n8n.entrypoints=https"
+#        - "traefik.http.routers.n8n.tls=true"
+#    networks:
+#      - traefik_public
+#
 
 
 networks:
   traefik_public:
     external: true
 
-volumes:
-  n8n_data:
-    external: true
+#volumes:
+#  n8n_data:
+#    external: true
