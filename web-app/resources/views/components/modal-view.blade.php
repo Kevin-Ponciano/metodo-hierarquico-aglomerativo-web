@@ -1,4 +1,4 @@
-<div class="modal modal-blur fade" id="modal-view" tabindex="-1" style="display: none;" aria-hidden="true">
+<div class="modal modal-blur fade" id="modal-view" tabindex="-1" style="display: none;" aria-hidden="true" wire:ignore.self>
     <div class="modal-dialog modal-full-width modal-dialog-centered" role="document">
         @if($registro)
             <div class="modal-content">

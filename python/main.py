@@ -138,7 +138,7 @@ def executar_agrupamento(caminho, n_clusters, is_normalizar_dados):
         for indice in indices:
             atributos_cluster.append(dados_tratados[indice].tolist())  
             #print(f"Objeto: {dados[indice]}, Classe: {classes[indice]}")
-        cluster_info["atributos"] = atributos_cluster.append(classes{indice})
+        cluster_info["atributos"] = atributos_cluster
         resultado_dict[f"Cluster - {str(i)}"] = cluster_info 
     
     sse_total = calcular_sse(clusters_indices, dados_tratados)
