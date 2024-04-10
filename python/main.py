@@ -9,25 +9,21 @@ def remover_ponto_virgula_final(linha):
 # Função para ler dados do arquivo e mapear classes para números
 def ler_dados_arquivo(caminho):
     dados = []
-    mapeamento_classes = {}
-    contador_classes = 0
+    classes = []
+    firstColumn = 0
 
     with open(caminho, "r", encoding="utf-8") as arquivo:
         leitor_csv = csv.reader(arquivo, delimiter=";")
         for linha in leitor_csv:
             if linha:
                 linha_limpa = remover_ponto_virgula_final(linha)
-                atributos = list(map(float, linha_limpa[0:-1])) # Converte strings para float
-                classe = linha_limpa[-1]
+                if(len(linha_limpa) == 6):
+                    firstColumn = 1
+                atributos = list(map(float, linha_limpa[firstColumn:-1]))
+                classes.append(linha_limpa[-1])
+                dados.append(atributos)
 
-                if classe not in mapeamento_classes:
-                    mapeamento_classes[classe] = contador_classes
-                    contador_classes += 1
-
-                classe_numerada = mapeamento_classes[classe]
-                dados.append(atributos + [classe_numerada])  
-
-    return dados
+    return dados, classes
 
 # Função para normalizar os dados
 def normalizar_dados(dados):
@@ -124,7 +120,7 @@ def calcular_sse(clusters, dados):
 
 def executar_agrupamento(caminho, n_clusters, is_normalizar_dados):
     resultado_dict = {}
-    dados = ler_dados_arquivo(caminho)
+    dados, classes = ler_dados_arquivo(caminho)
     
     if is_normalizar_dados:
         dados_tratados = normalizar_dados(dados)
@@ -138,20 +134,23 @@ def executar_agrupamento(caminho, n_clusters, is_normalizar_dados):
         atributos_cluster = []
         total_objetos = len(indices)
         cluster_info["total_objetos"] = total_objetos
+        #print(f"Cluster - {str(i)} com {total_objetos} objetos")
         for indice in indices:
-            atributos_cluster.append(dados_tratados[indice].tolist())  # Converte cada array NumPy para lista
-        cluster_info["atributos"] = atributos_cluster
-        resultado_dict[f"Cluster - {str(i)}"] = cluster_info  # Assegura que a chave é uma string
+            atributos_cluster.append(dados_tratados[indice].tolist())  
+            #print(f"Objeto: {dados[indice]}, Classe: {classes[indice]}")
+        cluster_info["atributos"] = atributos_cluster.append(classes{indice})
+        resultado_dict[f"Cluster - {str(i)}"] = cluster_info 
     
     sse_total = calcular_sse(clusters_indices, dados_tratados)
     for i, sse in enumerate(sse_total, 1):
-        resultado_dict[f"Cluster - {str(i)}"]["SSE"] = sse  # Adiciona o SSE ao respectivo cluster no dicionário
+        resultado_dict[f"Cluster - {str(i)}"]["SSE"] = sse 
+        #print(f"SSE do Cluster {str(i)}: {sse}")
     
     return resultado_dict
 
 if __name__ == "__main__":
-    n_clusters = 5
-    caminho = "/home/kevin/repositorios/metodo-hierarquico-aglomerativo-web/python/dados/flores.txt"
+    n_clusters = 4
+    caminho = "python/dados/flores.txt"
     is_normalizar_dados = False
     ahc = executar_agrupamento(caminho, n_clusters, is_normalizar_dados)
     print(json.dumps(ahc, indent=4))

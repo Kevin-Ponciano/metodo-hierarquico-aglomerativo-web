@@ -1,106 +1,106 @@
 {
-    "meta": {
-      "templateCredsSetupCompleted": true,
-      "instanceId": "f896c23e3988a121f65b79f60cde21e34e12316b953767bb97811bea1ac5cbd6"
-    },
-    "nodes": [
-      {
-        "parameters": {
-          "httpMethod": "POST",
-          "path": "34dfbc5f-04c1-4881-8d39-7d344130eada",
-          "responseMode": "responseNode",
-          "options": {}
-        },
-        "id": "7a6b97ed-d39f-465f-ac6f-55f2e459f0f1",
-        "name": "Webhook",
-        "type": "n8n-nodes-base.webhook",
-        "typeVersion": 1.1,
-        "position": [
-          880,
-          380
-        ],
-        "webhookId": "34dfbc5f-04c1-4881-8d39-7d344130eada"
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ae24439d7521fe9e875c91cd9e3671ac31cc48ed1b159d7d046a7349076c8ce4"
+  },
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "mha",
+        "responseMode": "responseNode",
+        "options": {}
       },
-      {
-        "parameters": {
-          "operation": "write",
-          "fileName": "=file.txt",
-          "options": {
-            "append": false
+      "id": "f98d45f0-c896-44e6-ac5e-4c36c0653f74",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [
+        700,
+        580
+      ],
+      "webhookId": "34dfbc5f-04c1-4881-8d39-7d344130eada"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "=file.txt",
+        "options": {
+          "append": false
+        }
+      },
+      "id": "347fadcf-628d-4f80-a297-b2acad6383e1",
+      "name": "Read/Write Files from Disk",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        920,
+        580
+      ]
+    },
+    {
+      "parameters": {
+        "command": "=echo 'import csv\nimport numpy as np\nimport json\n\n# Função para remover o ponto e vírgula final das linhas do arquivo CSV\ndef remover_ponto_virgula_final(linha):\n    return linha[:-1] if linha[-1] == \"\" else linha\n\n# Função para ler dados do arquivo e mapear classes para números\ndef ler_dados_arquivo(caminho):\n    dados = []\n    mapeamento_classes = {}\n    contador_classes = 0\n\n    with open(caminho, \"r\", encoding=\"utf-8\") as arquivo:\n        leitor_csv = csv.reader(arquivo, delimiter=\";\")\n        for linha in leitor_csv:\n            if linha:\n                linha_limpa = remover_ponto_virgula_final(linha)\n                atributos = list(map(float, linha_limpa[1:-1])) # Converte strings para float\n                classe = linha_limpa[-1]\n\n                if classe not in mapeamento_classes:\n                    mapeamento_classes[classe] = contador_classes\n                    contador_classes += 1\n\n                classe_numerada = mapeamento_classes[classe]\n                dados.append(atributos + [classe_numerada])  \n\n    return dados\n\n# Função para normalizar os dados\ndef normalizar_dados(dados):\n    dados_np = np.array(dados)\n    minimo = dados_np.min(axis=0)\n    maximo = dados_np.max(axis=0)\n\n    denominador = np.where((maximo - minimo) == 0, 1, maximo - minimo) # Evita divisão por zero\n    dados_normalizados = (dados_np - minimo) / denominador\n    return dados_normalizados\n\n# Função para calcular a distância euclidiana entre dois pontos\ndef calcular_distancia_euclidiana(ponto1, ponto2):\n    ponto1_array = np.array(ponto1)\n    ponto2_array = np.array(ponto2)\n    \n    diferenca = ponto1_array - ponto2_array\n    quadrado_diferencas = diferenca ** 2\n    soma_quadrados = np.sum(quadrado_diferencas)\n    distancia = np.sqrt(soma_quadrados)\n    \n    return distancia\n\n# Função principal para realizar a clusterização hierárquica aglomerativa\ndef clusterizacao_hierarquica(dados, n_clusters):\n    # Etapa 1: Inicializa cada dado como um cluster individual\n    clusters = [np.array(dado) for dado in dados]\n    indice_clusters = [[i] for i in range(len(dados))]\n    num_clusters = len(clusters)\n\n    # Prepara a matriz de distâncias com dimensões apropriadas\n    distancias = np.full((num_clusters, num_clusters), float(\"inf\"))\n\n    # Etapa 2: Preenche a matriz de distâncias com distâncias euclidianas\n    for i in range(num_clusters):\n        for j in range(i+1, num_clusters):\n            distancia_ij = calcular_distancia_euclidiana(clusters[i], clusters[j])\n            distancias[i, j] = distancias[j, i] = distancia_ij\n\n    # Repete as etapas 2 e 3 até atingir o número desejado de clusters\n    while len(clusters) > n_clusters:\n        dist_min = float(\"inf\")\n        para_unir = None\n\n        # Encontra os dois clusters mais próximos baseado na matriz de distâncias\n        for i in range(len(distancias)):\n            for j in range(i+1, len(distancias)):\n                if distancias[i, j] < dist_min:\n                    dist_min = distancias[i, j]\n                    para_unir = (i, j)\n\n        # Etapa 3: Une os dois clusters mais próximos\n        novo_cluster = np.mean([clusters[para_unir[0]], clusters[para_unir[1]]], axis=0)\n        clusters.append(novo_cluster)\n        indice_clusters.append(indice_clusters[para_unir[0]] + indice_clusters[para_unir[1]])\n\n        # Etapa 4: Atualiza a matriz de distâncias para refletir a união dos clusters\n        # Adiciona uma nova linha e coluna à matriz de distâncias\n        num_clusters_atual = len(distancias)\n        nova_coluna = np.full((num_clusters_atual, 1), float(\"inf\"))\n        nova_linha = np.full((1, num_clusters_atual+1), float(\"inf\"))\n        \n        distancias = np.append(distancias, nova_coluna, axis=1)\n        distancias = np.append(distancias, nova_linha, axis=0)\n\n    \n        # Calcula a distância do novo cluster para todos os outros clusters\n        for i in range(len(distancias)-1):\n            distancias[i, -1] = distancias[-1, i] = calcular_distancia_euclidiana(novo_cluster, clusters[i])\n        \n        # Remove os clusters antigos da matriz de distâncias\n        distancias = np.delete(distancias, para_unir, axis=0)\n        distancias = np.delete(distancias, para_unir, axis=1)\n        # Remove os clusters antigos da lista de clusters\n        clusters.pop(max(para_unir))\n        clusters.pop(min(para_unir))\n        # Remove os índices dos clusters antigos\n        indice_clusters.pop(max(para_unir))\n        indice_clusters.pop(min(para_unir))\n\n    # Retorna os índices dos clusters finais\n    return indice_clusters\n\n# Função para calcular a soma dos quadrados dos erros (SSE) de cada cluster\ndef calcular_sse(clusters, dados):\n    sse = []  \n    for cluster_indices in clusters:\n        cluster = np.array([dados[i] for i in cluster_indices]) # Cria um array com os dados de cada cluster\n        centroide = np.mean(cluster) # Calcula o centroide de cada cluster como a média dos seus pontos\n        soma_sse = np.sum((cluster - centroide) ** 2) # Calcula o SSE como a soma das distâncias quadradas de cada ponto ao centroide\n        sse.append(soma_sse) # Adiciona o SSE do cluster à lista de SSEs\n    return sse\n\n\ndef executar_agrupamento(caminho, n_clusters, is_normalizar_dados):\n    resultado_dict = {}\n    dados = ler_dados_arquivo(caminho)\n    \n    if is_normalizar_dados:\n        dados_tratados = normalizar_dados(dados)\n    else:\n        dados_tratados = np.array(dados)\n        \n    clusters_indices = clusterizacao_hierarquica(dados_tratados, n_clusters)\n\n    for i, indices in enumerate(clusters_indices, 1):\n        cluster_info = {}\n        atributos_cluster = []\n        total_objetos = len(indices)\n        cluster_info[\"total_objetos\"] = total_objetos\n        for indice in indices:\n            atributos_cluster.append(dados_tratados[indice].tolist())  # Converte cada array NumPy para lista\n        cluster_info[\"atributos\"] = atributos_cluster\n        resultado_dict[f\"Cluster - {str(i)}\"] = cluster_info  # Assegura que a chave é uma string\n    \n    sse_total = calcular_sse(clusters_indices, dados_tratados)\n    for i, sse in enumerate(sse_total, 1):\n        resultado_dict[f\"Cluster - {str(i)}\"][\"SSE\"] = sse  # Adiciona o SSE ao respectivo cluster no dicionário\n    \n    return resultado_dict\n\nif __name__ == \"__main__\":\n    n_clusters = {{$(\"Webhook\").item.json[\"body\"][\"qtdClusters\"]}}\n    caminho = \"file.txt\"\n    is_normalizar_dados = {{$(\"Webhook\").item.json[\"body\"][\"normalizarDados\"]}}\n    ahc = executar_agrupamento(caminho, n_clusters, is_normalizar_dados)\n    print(json.dumps(ahc, indent=4))\n\n\n' > python.py; python python.py"
+      },
+      "id": "573b5b61-129d-460b-981a-d3c2360750bf",
+      "name": "Execute Command",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        1160,
+        580
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"response\":{{$json.stdout}}\n}",
+        "options": {}
+      },
+      "id": "c702bddd-a5f9-43dc-9fb0-5a8df53b3170",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        1360,
+        580
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
           }
-        },
-        "id": "8eb137d4-bb03-4daf-9daf-4d6214595591",
-        "name": "Read/Write Files from Disk",
-        "type": "n8n-nodes-base.readWriteFile",
-        "typeVersion": 1,
-        "position": [
-          1100,
-          380
         ]
-      },
-      {
-        "parameters": {
-          "command": "=echo 'import csv\nimport numpy as np\nimport json\n\n# Função para remover o ponto e vírgula final das linhas do arquivo CSV\ndef remover_ponto_virgula_final(linha):\n    return linha[:-1] if linha[-1] == \"\" else linha\n\n# Função para ler dados do arquivo e mapear classes para números\ndef ler_dados_arquivo(caminho):\n    dados = []\n    mapeamento_classes = {}\n    contador_classes = 0\n\n    with open(caminho, \"r\", encoding=\"utf-8\") as arquivo:\n        leitor_csv = csv.reader(arquivo, delimiter=\";\")\n        for linha in leitor_csv:\n            if linha:\n                linha_limpa = remover_ponto_virgula_final(linha)\n                atributos = list(map(float, linha_limpa[1:-1])) # Converte strings para float\n                classe = linha_limpa[-1]\n\n                if classe not in mapeamento_classes:\n                    mapeamento_classes[classe] = contador_classes\n                    contador_classes += 1\n\n                classe_numerada = mapeamento_classes[classe]\n                dados.append(atributos + [classe_numerada])  \n\n    return dados\n\n# Função para normalizar os dados\ndef normalizar_dados(dados):\n    dados_np = np.array(dados)\n    minimo = dados_np.min(axis=0)\n    maximo = dados_np.max(axis=0)\n\n    denominador = np.where((maximo - minimo) == 0, 1, maximo - minimo) # Evita divisão por zero\n    dados_normalizados = (dados_np - minimo) / denominador\n    return dados_normalizados\n\n# Função para calcular a distância euclidiana entre dois pontos\ndef calcular_distancia_euclidiana(ponto1, ponto2):\n    ponto1_array = np.array(ponto1)\n    ponto2_array = np.array(ponto2)\n    \n    diferenca = ponto1_array - ponto2_array\n    quadrado_diferencas = diferenca ** 2\n    soma_quadrados = np.sum(quadrado_diferencas)\n    distancia = np.sqrt(soma_quadrados)\n    \n    return distancia\n\n# Função principal para realizar a clusterização hierárquica aglomerativa\ndef clusterizacao_hierarquica(dados, n_clusters):\n    # Etapa 1: Inicializa cada dado como um cluster individual\n    clusters = [np.array(dado) for dado in dados]\n    indice_clusters = [[i] for i in range(len(dados))]\n    num_clusters = len(clusters)\n\n    # Prepara a matriz de distâncias com dimensões apropriadas\n    distancias = np.full((num_clusters, num_clusters), float(\"inf\"))\n\n    # Etapa 2: Preenche a matriz de distâncias com distâncias euclidianas\n    for i in range(num_clusters):\n        for j in range(i+1, num_clusters):\n            distancia_ij = calcular_distancia_euclidiana(clusters[i], clusters[j])\n            distancias[i, j] = distancias[j, i] = distancia_ij\n\n    # Repete as etapas 2 e 3 até atingir o número desejado de clusters\n    while len(clusters) > n_clusters:\n        dist_min = float(\"inf\")\n        para_unir = None\n\n        # Encontra os dois clusters mais próximos baseado na matriz de distâncias\n        for i in range(len(distancias)):\n            for j in range(i+1, len(distancias)):\n                if distancias[i, j] < dist_min:\n                    dist_min = distancias[i, j]\n                    para_unir = (i, j)\n\n        # Etapa 3: Une os dois clusters mais próximos\n        novo_cluster = np.mean([clusters[para_unir[0]], clusters[para_unir[1]]], axis=0)\n        clusters.append(novo_cluster)\n        indice_clusters.append(indice_clusters[para_unir[0]] + indice_clusters[para_unir[1]])\n\n        # Etapa 4: Atualiza a matriz de distâncias para refletir a união dos clusters\n        # Adiciona uma nova linha e coluna à matriz de distâncias\n        num_clusters_atual = len(distancias)\n        nova_coluna = np.full((num_clusters_atual, 1), float(\"inf\"))\n        nova_linha = np.full((1, num_clusters_atual+1), float(\"inf\"))\n        \n        distancias = np.append(distancias, nova_coluna, axis=1)\n        distancias = np.append(distancias, nova_linha, axis=0)\n\n    \n        # Calcula a distância do novo cluster para todos os outros clusters\n        for i in range(len(distancias)-1):\n            distancias[i, -1] = distancias[-1, i] = calcular_distancia_euclidiana(novo_cluster, clusters[i])\n        \n        # Remove os clusters antigos da matriz de distâncias\n        distancias = np.delete(distancias, para_unir, axis=0)\n        distancias = np.delete(distancias, para_unir, axis=1)\n        # Remove os clusters antigos da lista de clusters\n        clusters.pop(max(para_unir))\n        clusters.pop(min(para_unir))\n        # Remove os índices dos clusters antigos\n        indice_clusters.pop(max(para_unir))\n        indice_clusters.pop(min(para_unir))\n\n    # Retorna os índices dos clusters finais\n    return indice_clusters\n\n# Função para calcular a soma dos quadrados dos erros (SSE) de cada cluster\ndef calcular_sse(clusters, dados):\n    sse = []  \n    for cluster_indices in clusters:\n        cluster = np.array([dados[i] for i in cluster_indices]) # Cria um array com os dados de cada cluster\n        centroide = np.mean(cluster) # Calcula o centroide de cada cluster como a média dos seus pontos\n        soma_sse = np.sum((cluster - centroide) ** 2) # Calcula o SSE como a soma das distâncias quadradas de cada ponto ao centroide\n        sse.append(soma_sse) # Adiciona o SSE do cluster à lista de SSEs\n    return sse\n\n\ndef executar_agrupamento(caminho, n_clusters, is_normalizar_dados):\n    resultado_dict = {}\n    dados = ler_dados_arquivo(caminho)\n    \n    if is_normalizar_dados:\n        dados_tratados = normalizar_dados(dados)\n    else:\n        dados_tratados = np.array(dados)\n        \n    clusters_indices = clusterizacao_hierarquica(dados_tratados, n_clusters)\n\n    for i, indices in enumerate(clusters_indices, 1):\n        cluster_info = {}\n        atributos_cluster = []\n        total_objetos = len(indices)\n        cluster_info[\"total_objetos\"] = total_objetos\n        for indice in indices:\n            atributos_cluster.append(dados_tratados[indice].tolist())  # Converte cada array NumPy para lista\n        cluster_info[\"atributos\"] = atributos_cluster\n        resultado_dict[f\"Cluster - {str(i)}\"] = cluster_info  # Assegura que a chave é uma string\n    \n    sse_total = calcular_sse(clusters_indices, dados_tratados)\n    for i, sse in enumerate(sse_total, 1):\n        resultado_dict[f\"Cluster - {str(i)}\"][\"SSE\"] = sse  # Adiciona o SSE ao respectivo cluster no dicionário\n    \n    return resultado_dict\n\nif __name__ == \"__main__\":\n    n_clusters = {{$(\"Webhook\").item.json[\"body\"][\"qtdClusters\"]}}\n    caminho = \"file.txt\"\n    is_normalizar_dados = {{$(\"Webhook\").item.json[\"body\"][\"normalizarDados\"]}}\n    ahc = executar_agrupamento(caminho, n_clusters, is_normalizar_dados)\n    print(json.dumps(ahc, indent=4))\n\n\n' > python.py; python python.py"
-        },
-        "id": "1de30419-bfa7-42a7-986d-ca2c23ee953f",
-        "name": "Execute Command",
-        "type": "n8n-nodes-base.executeCommand",
-        "typeVersion": 1,
-        "position": [
-          1340,
-          380
-        ]
-      },
-      {
-        "parameters": {
-          "respondWith": "json",
-          "responseBody": "={\n  \"response\":{{$json.stdout}}\n}",
-          "options": {}
-        },
-        "id": "7584c40b-420c-43ff-8934-1b5bc8ae4476",
-        "name": "Respond to Webhook",
-        "type": "n8n-nodes-base.respondToWebhook",
-        "typeVersion": 1,
-        "position": [
-          1540,
-          380
-        ]
-      }
-    ],
-    "connections": {
-      "Webhook": {
-        "main": [
-          [
-            {
-              "node": "Read/Write Files from Disk",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "Read/Write Files from Disk": {
-        "main": [
-          [
-            {
-              "node": "Execute Command",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "Execute Command": {
-        "main": [
-          [
-            {
-              "node": "Respond to Webhook",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      }
+      ]
     },
-    "pinData": {}
-  }
+    "Read/Write Files from Disk": {
+      "main": [
+        [
+          {
+            "node": "Execute Command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {}
+}
